@@ -460,6 +460,9 @@ public sealed class StorageWindow : BaseWindow
             _toRemove.Add(ent);
         }
 
+		if (!_entity.EntityExists(currentEnt) || _entity.IsDeleted(currentEnt))
+		return;
+
         foreach (var ent in _toRemove)
         {
             _pieces.Remove(ent, out var data);
@@ -574,6 +577,9 @@ public sealed class StorageWindow : BaseWindow
             return;
         }
 
+		if (!_entity.EntityExists(currentEnt) || _entity.IsDeleted(currentEnt))
+		return;
+
         if (!_entity.TryGetComponent<ItemComponent>(currentEnt, out var itemComp))
             return;
 
@@ -593,7 +599,10 @@ public sealed class StorageWindow : BaseWindow
 
         foreach (var locations in storageComponent.SavedLocations)
         {
-            if (!_entity.TryGetComponent<MetaDataComponent>(currentEnt, out var meta) || meta.EntityName != locations.Key)
+            if (!_entity.EntityExists(currentEnt) ||
+			_entity.IsDeleted(currentEnt) ||
+			!_entity.TryGetComponent<MetaDataComponent>(currentEnt, out var meta) ||
+			meta.EntityName != locations.Key)
                 continue;
 
             float spot = 0;
@@ -601,6 +610,8 @@ public sealed class StorageWindow : BaseWindow
 
             foreach (var location in locations.Value)
             {
+				if (!_entity.EntityExists(currentEnt) || _entity.IsDeleted(currentEnt))
+				break;
                 var shape = itemSystem.GetAdjustedItemShape(currentEnt, location);
                 var bound = shape.GetBoundingBox();
 
